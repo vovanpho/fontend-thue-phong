@@ -1,12 +1,10 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import VueSplide from '@splidejs/vue-splide';
 import store from './store'
 import Vuelidate from 'vuelidate'
 import { BootstrapVue, IconsPlugin, FormDatepickerPlugin } from 'bootstrap-vue'
 Vue.use(Vuelidate)
-Vue.use(VueSplide)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(FormDatepickerPlugin)

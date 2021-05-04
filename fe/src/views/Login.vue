@@ -158,7 +158,7 @@ export default {
 };
 </script>
 
-<style scoped lang="css">
+<style scoped >
 
 a {
   text-decoration: none;
