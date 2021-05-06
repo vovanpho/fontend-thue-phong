@@ -44,10 +44,20 @@
           <b-input-group class="mb-3" prepend="Price">
               <b-form-input v-model="item.price"></b-form-input>
           </b-input-group>
-          <b-input-group class="mb-3" prepend="Description">
+          <!-- <b-input-group class="mb-3" prepend="Description">
               <b-form-input v-model="item.description"></b-form-input>
-          </b-input-group>
-          <div >
+          </b-input-group> -->
+          <b-form-group
+            label="Description"
+            class="mb-0"
+          >
+            <b-form-textarea
+              id="textarea-formatter"
+              v-model="item.description"
+              placeholder="Enter your text"
+            ></b-form-textarea>
+          </b-form-group>
+          <b-form-group class="mt-3 mb-0" label="Lua chon the loai phong">
               <b-form-select v-model="item.roomType.nameTypeRoom" @change="handlerChangeRoomType($event, item.roomType)">
                 <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
                             {{selectOption.nameTypeRoom}} 
@@ -57,7 +67,7 @@
               <b-input-group-append >
                 <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(item)">Save</b-button>
               </b-input-group-append>
-          </div>
+          </b-form-group>
       </b-modal>
     <!-- Main table element -->
     <b-table
@@ -75,6 +85,9 @@
       small
       @filtered="onFiltered"
     >
+      <template #cell(index)="data">
+            {{ data.index + 1 }}
+      </template>
       <template #cell(name)="row">
         {{ row.value.first }} {{ row.value.last }}
       </template>
@@ -98,30 +111,68 @@
                     <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
                     </b-input-group-append>
                 </b-input-group>
+                <div  class="p-4 bg-dark"  v-if="key=='roomImgs'" style=" margin: 20px 0;">
+                  <p style="color: white;" >Hinh anh phong:</p>
+                  <upload-file style="margin: 15px 0;" :dataSetId="row.item.id" dataSetCh="Nomal" ></upload-file>
+                  <div style="display: grid; grid-template-columns: 25% 25% 25% 25% ; overflow: hidden; " v-if="row.item[key].length>0">
+                    <div v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)" style="height: 168px; margin: 0 5px;">
+                      <img  :src="`data:${it.type};base64,${it.data}`" alt="Image" style="width:100%; height: auto;">
+                    </div>
+                  </div>
+                </div>
+                <b-form-group 
+                          label="Description"
+                          class="mb-0 mb-4"
+                          v-if="key=='description'"
+                        >
+                          <b-form-textarea
+                            id="textarea-formatter"
+                            v-model="row.item[key]"
+                            placeholder="Enter your text"
+                          ></b-form-textarea>
+                </b-form-group>
                 <b-input-group class="mb-3" prepend="Price" v-if="key=='price'">
                     <b-form-input v-model="row.item[key]"></b-form-input>
                     <b-input-group-append>
                     <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
                     </b-input-group-append>
-                </b-input-group>
+                </b-input-group >
+
+                <div  class="p-4 bg-dark"  v-if="key=='priceImgs'" style=" margin: 20px 0;">
+                  <p style="color: white;">Hinh anh bang gia:</p>
+                  <upload-file style="margin: 15px 0;" :dataSetId="row.item.id" dataSetCh="Price"></upload-file>
+                  <div style="display: grid; grid-template-columns: 25% 25% 25% 25% ; overflow: hidden;  " v-if="row.item[key].length>0">
+                    <div v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)" style="height: 168px; margin: 0 5px;">
+                      <img  :src="`data:${it.type};base64,${it.data}`" alt="Image" style="width:100%; height: auto;">
+                    </div>
+                  </div>
+                </div>
+                
                 <div v-if="key=='roomType'">
                     <b-form-select v-model="selected" @change="handlerChangeRoomType($event, row.item[key])">
                         <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
                             {{selectOption.nameTypeRoom}} 
                         </option>
                     </b-form-select>
-                    <div class="mt-3">Selected: <strong>{{ selected=row.item[key].nameTypeRoom }}</strong></div>
+                    <div class="mt-3">The loai phong: <strong>{{ selected=row.item[key].nameTypeRoom }}</strong></div>
                     <b-input-group-append >
                         <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
                     </b-input-group-append>
                 </div>
+                <!-- <div v-if="key=='roomImgs'">
+                    <div   v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)">
+                    <img :src="`data:${it.type};base64,${it.data}`">  
+                    </div>
+                </div> -->
+                
+                
                 
             </li>
           </ul>
         </b-card>
-        
       </template>
     </b-table>
+
   </b-container>
 </template>
 <style scoped src="bootstrap/dist/css/bootstrap.css"></style>
@@ -129,7 +180,12 @@
 <script>
 import {PATH, requestHeader} from '../../../index/index.js'
 import axios from "axios";
+import UploadFile from '../UploadFile.vue';
   export default {
+    name: "Room",
+    components:{
+      UploadFile
+    },
     data() {
       return {
         items: [],
@@ -152,7 +208,9 @@ import axios from "axios";
             }
         },
         fields: [
+          'index',
           { key: 'nameRoom', label: 'Name', sortable: true },
+          { key: "roomType", label: "Room", formatter:'froomName' },
           {
             sortable: true,
             sortByFormatted: true,
@@ -274,7 +332,14 @@ import axios from "axios";
           .catch((error) => {
             console.log(error);
           });
-      }
+      },
+      handleLoadImg(data){
+        
+      },
+      froomName(value) {
+        // console.log(value)
+        return `${value.nameTypeRoom}`
+      },
     }
   }
 </script>

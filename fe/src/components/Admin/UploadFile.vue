@@ -1,109 +1,77 @@
 <template>
-  <div>
-    <div v-if="currentFile" class="progress">
-      <div
-        class="progress-bar progress-bar-info progress-bar-striped"
-        role="progressbar"
-        :aria-valuenow="progress"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        :style="{ width: progress + '%' }"
-      >
-        {{ progress }}%
-      </div>
-    </div>
-<!-- 
-    <label class="btn btn-default">
-      <input type="file" ref="file" @change="selectFile" />
-    </label>
-
-    <button class="btn btn-success" :disabled="!selectedFiles" @click="upload">
-      Upload
-    </button> -->
-    <!-- <button class="btn btn-success" @click="getFiles()">
-      click
-    </button> -->
-    <div class="alert alert-light" role="alert">{{ message }}</div>
-
-    <div class="card">
-      <div class="card-header">List of Files</div>
-      <ul class="list-group list-group-flush">
-        <li
-          class="list-group-item"
-          v-for="(file, index) in fileInfos"
-          :key="index"
-        >
-          <a :href="file.url">{{ file.name }}</a>
-        </li>
-      </ul>
-    </div>
+  <div class="container">
+    <b-form @submit="submitFile">
+      <b-form-file multiple
+        accept="image/jpeg, image/png"
+        v-model="files"
+        :state="Boolean(files)"
+        ref="file"
+        placeholder="Choose a file or drop it here..."
+        drop-placeholder="Drop file here..."
+        required>
+      </b-form-file>
+      <b-form-select v-if="dataSetCh==''" v-model="selected" :options="options" required></b-form-select>
+      <b-button type="submit" >Save</b-button>
+    </b-form>
+    {{dataSetCh}}
   </div>
 </template>
 
 <script>
-// import UploadService from "../../assets/template_admin/js/upload.js";
-// import { PATH, requestHeader } from "../../../src/index/index.js";
-// import axios from axios;
+import { PATH, requestHeader } from "../../index/index.js";
+import axios from "axios";
 export default {
-  name: "upload-files",
-  data() {
-    return {
-      selectedFiles: undefined,
-      currentFile: undefined,
-      progress: 0,
-      message: "",
-      fileInfos: [],
-    };
+  props:{
+    dataSetId: String,
+    dataSetCh: String
   },
-  mounted() {
-    
-      // UploadService.getFiles()
-  
-  },
-  created(){
-    // this.getFiles()
+  data(){
+    return{
+      files:[],
+      selected: this.dataSetCh || null,
+      options:[
+        {value: null, text: 'Lua chon loai hinh' },
+        {value: 'Nomal', text: 'Hinh anh thuong'},
+        {value: 'Price', text: 'Hinh anh tien'}
+      ],
+      show:true,
+    }
   },
   methods: {
-    // getFiles(){
-    //   console.log("dd")
-    //    axios({URL:`${PATH}api/files`,
-    //     method: "GET",
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-    //     }
-    //   }).then(response=>{this.fileInfos=response.data})
-    //   .catch(
-    //     console.log()
-    //   )
-    // },
-  //   selectFile() {
-  //     this.selectedFiles = this.$refs.file.files;
-  //   },
-  //   upload() {
-  //     this.progress = 0;
-  //     this.currentFile = this.selectedFiles.item(0);
-  //     UploadService.upload(this.currentFile, event => {
-  //       this.progress = Math.round((100 * event.loaded) / event.total);
-  //     })
-  //       .then(response => {
-  //         this.message = response.data.message;
-  //         return UploadService.getFiles();
-  //       })
-  //       .then(files => {
-  //         this.fileInfos = files.data;
-  //       })
-  //       .catch(() => {
-  //         this.progress = 0;
-  //         this.message = "Could not upload the file!";
-  //         this.currentFile = undefined;
-  //       });
-
-  //     this.selectedFiles = undefined;
-  //   }
-   },
-};
+    handleFileUpload(){
+      this.file = this.$refs.file.files;
+      for( var i = 0; i < uploadedFiles.length; i++ ){
+        this.files.push( uploadedFiles[i] );
+      }
+    },
+    submitFile(event){
+     event.preventDefault();
+      let formData = new FormData();
+      for( var i = 0; i < this.files.length; i++ ){
+        let file = this.files[i];
+        formData.append('file', file);
+        formData.append('cateOfImg', this.selected);
+        formData.append('id', this.dataSetId)
+      }
+      formData.forEach(t=>console.log(t))
+      axios.post( `${PATH}api/upload`,
+        formData,{
+          headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization':`Bearer ${localStorage.getItem('accessToken')}`
+            }
+        }
+      ).then(function(){
+        console.log('SUCCESS!!');
+      })
+      .catch(function(){
+        console.log('FAILURE!!');
+      });
+    },
+  }
+}
 </script>
 
 <style>
+
 </style>
