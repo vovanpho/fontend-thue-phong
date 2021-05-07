@@ -11,12 +11,12 @@ Vue.use(FormDatepickerPlugin)
 
 
 // icon
-import {library} from '@fortawesome/fontawesome-svg-core'
-import {faHeart, faExternalLinkAlt, faStepForward, faStepBackward, faPlay, faPause, faThumbsDown, faThumbsUp,faTimes, faUser, faEnvelope, faLock, faAddressBook, faTransgender, faPhone
-} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
-library.add(faHeart, faExternalLinkAlt, faStepForward, faStepBackward, faPause, faPlay, faThumbsUp, faThumbsDown, faTimes, faUser, faEnvelope, faLock, faAddressBook, faTransgender, faPhone)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
+// import {library} from '@fortawesome/fontawesome-svg-core'
+// import {faHeart, faExternalLinkAlt, faStepForward, faStepBackward, faPlay, faPause, faThumbsDown, faThumbsUp,faTimes, faUser, faEnvelope, faLock, faAddressBook, faTransgender, faPhone
+// } from '@fortawesome/free-solid-svg-icons'
+// import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
+// library.add(faHeart, faExternalLinkAlt, faStepForward, faStepBackward, faPause, faPlay, faThumbsUp, faThumbsDown, faTimes, faUser, faEnvelope, faLock, faAddressBook, faTransgender, faPhone)
+// Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 
 Vue.config.productionTip = false

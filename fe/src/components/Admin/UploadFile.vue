@@ -13,7 +13,6 @@
       <b-form-select v-if="dataSetCh==''" v-model="selected" :options="options" required></b-form-select>
       <b-button type="submit" >Save</b-button>
     </b-form>
-    {{dataSetCh}}
   </div>
 </template>
 
@@ -50,9 +49,10 @@ export default {
       for( var i = 0; i < this.files.length; i++ ){
         let file = this.files[i];
         formData.append('file', file);
-        formData.append('cateOfImg', this.selected);
-        formData.append('id', this.dataSetId)
+        
       }
+      formData.append('cateOfImg', this.selected);
+      formData.append('id', this.dataSetId)
       formData.forEach(t=>console.log(t))
       axios.post( `${PATH}api/upload`,
         formData,{
@@ -63,6 +63,7 @@ export default {
         }
       ).then(function(){
         console.log('SUCCESS!!');
+        this.$emit('eventCallLoadPage');
       })
       .catch(function(){
         console.log('FAILURE!!');

@@ -113,10 +113,16 @@
                 </b-input-group>
                 <div  class="p-4 bg-dark"  v-if="key=='roomImgs'" style=" margin: 20px 0;">
                   <p style="color: white;" >Hinh anh phong:</p>
-                  <upload-file style="margin: 15px 0;" :dataSetId="row.item.id" dataSetCh="Nomal" ></upload-file>
+                  <upload-file style="margin: 15px 0;" :dataSetId="row.item.id" dataSetCh="Nomal" v-on:eventCallLoadPage="loadPage"></upload-file>
                   <div style="display: grid; grid-template-columns: 25% 25% 25% 25% ; overflow: hidden; " v-if="row.item[key].length>0">
-                    <div v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)" style="height: 168px; margin: 0 5px;">
+                    <div v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)" style="height: 168px; margin: 0 5px; position: relative;">
                       <img  :src="`data:${it.type};base64,${it.data}`" alt="Image" style="width:100%; height: auto;">
+                      <b-button-group  style="position: absolute; top: 0;right: 0;">
+                        <b-dropdown size="sm" right no-caret>
+                            <b-dropdown-item><b-icon class="mr-2" icon="pencil-square" aria-hidden="true"></b-icon>Edit</b-dropdown-item>
+                            <b-dropdown-item @click="handlerDelete(it.id)"><b-icon class="mr-2" icon="trash" aria-hidden="true"></b-icon>Delete</b-dropdown-item>
+                        </b-dropdown>
+                      </b-button-group>
                     </div>
                   </div>
                 </div>
@@ -281,7 +287,6 @@ import UploadFile from '../UploadFile.vue';
         this.currentPage = 1
       },
       handlerSaveName(e){
-        console.log(e)
           fetch(`${PATH}api/room/set-data-room`,
           { method: 'POST',
             headers: requestHeader().headers,
@@ -340,6 +345,25 @@ import UploadFile from '../UploadFile.vue';
         // console.log(value)
         return `${value.nameTypeRoom}`
       },
+      handlerDelete(e){
+        console.log(e)
+        fetch(`${PATH}api/files/delete/${e}`, {
+          method: "POST",
+          headers: requestHeader().headers,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              alert("delete false");
+              this.loadPage();
+            } else {
+              alert("delete thanh cong");
+              this.loadPage();
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
   }
 </script>
