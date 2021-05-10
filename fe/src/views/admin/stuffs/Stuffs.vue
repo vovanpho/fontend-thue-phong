@@ -49,22 +49,9 @@
       <b-input-group class="mb-3" prepend="Description">
         <b-form-input v-model="item.description"></b-form-input>
       </b-input-group>
+      <select-room v-on:eventChange="handlerChangeRoom($event)"></select-room>
       <div>
-        <b-form-select
-          v-model="item.room.nameRoom"
-          @change="handlerChangeRoomType($event, item.room)"
-        >
-          <option
-            v-for="(selectOption, indexOption) in options"
-            :key="indexOption.id"
-            :value="selectOption.nameRoom"
-          >
-            {{ selectOption.nameRoom }}
-          </option>
-        </b-form-select>
-        <div class="mt-3">
-          Selected: <strong>{{ item.room.nameRoom }}</strong>
-        </div>
+        
         <b-input-group-append>
           <b-button
             size="sm"
@@ -91,6 +78,7 @@
       show-empty
       small
       @filtered="onFiltered"
+      hover
     >
         <template #cell(index)="data">
             {{ data.index + 1 }}
@@ -113,57 +101,15 @@
             <li v-for="(value, key) in row.item" :key="key.id">
               <b-input-group class="mb-3" prepend="Name" v-if="key == 'nameStuff'">
                 <b-form-input v-model="row.item[key]"></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    size="sm"
-                    text="Button"
-                    variant="success"
-                    @click="handlerSaveName(row.item)"
-                    >Save</b-button
-                  >
-                </b-input-group-append>
               </b-input-group>
               <b-input-group class="mb-3" prepend="Description" v-if="key == 'description'">
                 <b-form-input v-model="row.item[key]"></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    size="sm"
-                    text="Button"
-                    variant="success"
-                    @click="handlerSaveName(row.item)"
-                    >Save</b-button
-                  >
-                </b-input-group-append>
               </b-input-group>
               <b-input-group class="mb-3" prepend="Quality" v-if="key == 'quality'">
                 <b-form-input v-model="row.item[key]"></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    size="sm"
-                    text="Button"
-                    variant="success"
-                    @click="handlerSaveName(row.item)"
-                    >Save</b-button
-                  >
-                </b-input-group-append>
               </b-input-group>
               <div v-if="key == 'room'">
-                <b-form-select
-                  v-model="selected"
-                  @change="handlerChangeRoomType($event, row.item[key])"
-                >
-                  <option
-                    v-for="(selectOption, indexOption) in options"
-                    :key="indexOption.id"
-                    :value="selectOption.nameRoom"
-                  >
-                    {{ selectOption.nameRoom }}
-                  </option>
-                </b-form-select>
-                <div class="mt-3">
-                  Selected:
-                  <strong>{{ (selected = row.item[key].nameRoom) }}</strong>
-                </div>
+                <select-room :dataSetRoom="row.item[key]" v-on:eventChange="handlerChangeRoom($event,row.item[key])" ></select-room>
                 <b-input-group-append>
                   <b-button
                     size="sm"
@@ -186,7 +132,11 @@
 <script>
 import { PATH, requestHeader } from "../../../index/index.js";
 import axios from "axios";
+import SelectRoom from "../../../components/Admin/room/SelectRoom.vue"
 export default {
+  components:{
+    SelectRoom
+  },
   data() {
     return {
       items: [],
@@ -258,7 +208,7 @@ export default {
         })
         .then((response) => {
           this.items = response.data;
-          console.log(this.items);
+          // console.log(this.items);
           this.totalRows = response.data.length;
         });
     },
@@ -272,15 +222,13 @@ export default {
         })
         .then((response) => {
           this.options = response.data;
-          console.log(this.options);
+          // console.log(this.options);
         });
     },
     froomName(value) {
         return `${value.nameRoom} -- ${value.roomType.nameTypeRoom}`
       },
-    // froomTypeName(value){
-    //     return ``
-    // },
+
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -310,14 +258,21 @@ export default {
           console.log(error);
         });
     },
-    handlerChangeRoomType(event, pram) {
-      this.options.forEach((element) => {
-        if (element.nameRoom == event) {
-          pram.id = element.id;
-          pram.nameRoom = element.nameRoom;
+    handlerChangeRoom(event, pram) {
+       if(pram){
+          this.options.forEach(element => {
+            if(element.id==event.id){
+              pram.id=element.id
+              pram.nameRoom=element.nameRoom
+            }
+          });
         }
-      });
-      console.log(this.items);
+        this.options.forEach(element => {
+            if(element.id==event.id){
+              this.item.room.id=element.id
+              this.item.room.nameRoom=element.nameRoom
+            }
+          });
     },
     deleteRoomType(e) {
       fetch(`${PATH}api/room-type/delete`, {

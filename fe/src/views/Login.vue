@@ -106,7 +106,6 @@ export default {
             account.password=formElement.querySelector('#password').value;
             //post data login
             var responseLogin = requesLogin(account);
-            this.$router.push('/admin')
           } else {
             console.log("nhap chua chinh xac");//error
             formValid = true;

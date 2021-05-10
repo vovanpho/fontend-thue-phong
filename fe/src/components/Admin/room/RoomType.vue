@@ -1,69 +1,50 @@
 <template>
-    <div>
-        <div>
-            <form>
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Tên loại</label>
-                    <input type="text" class="form-control" v-model="form.name" id="" aria-describedby="">
-                </div>
-                <button type="submit" class="btn btn-primary" :disabled="submitStatus === 'PENDING'">Save</button>
-                <p class="typo__p" v-if="submitStatus === 'OK'">Saved</p>
-                <p class="typo__p" v-if="submitStatus === 'ERROR'"> Please fill or select the form correctly. </p>
-                <p class="typo__p" v-if="submitStatus === 'PENDING'">Sending...</p>
-            </form>
-        </div>
-    </div>
+  <div class="container">
+    <b-form-select v-model="selected" @change="handlerChangeRoomType($event)">
+        <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
+              {{selectOption.nameTypeRoom}} 
+        </option>
+    </b-form-select>
+    <div class="mt-2 mb-3">The loai phong: <strong>{{ selected=dataSetName||selected }}</strong></div>
+  </div>
 </template>
 
 <script>
-export default {
+import {PATH, requestHeader} from '../../../index/index.js'
+import axios from "axios";
+  export default {
+    name:"RoomType",
+    props:{
+      dataSetName:String
+    },
     data() {
         return {
-            form: {
-                id: null ,
-                name: ''
-            },
-            submitStatus: null
+            options:null,
+            selected:null,
         }
     },
-
-    methods: {
-    submit() {
-      console.log('submit!')
-      this.$v.$touch()
-      if (this.$v.$invalid) {
-        this.submitStatus = 'ERROR'
-      } else {
-        // do your submit logic here
-        this.register(this.form)
-            this.submitStatus = 'PENDING'
-            setTimeout(() => {
-            this.submitStatus = 'OK'
-            }, 500)
-      }
+    created(){
+      this.loadPageRoomType();
     },
-    register(form) {
-      console.log(form)
-      fetch(`${PATH}api/room/set-date-type`,
-      {  method: 'POST',
-          headers: { 
-              'Content-Type': 'application/json'  
-          },
-          body: JSON.stringify(form)
-      })
-      .then(response => { 
-        console.log(response)
-          if(!response.ok){
-            alert("name already exists")
-          }else{
-            alert("successfully")
-          }
+    methods: {
+      loadPageRoomType(){
+        axios
+        .get(`${PATH}api/room-type/get-list-data`,{
+          headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization':`Bearer ${localStorage.getItem('accessToken')}`
+                }
         })
-      .catch(error => {
-            console.log(error)
-      });
+        .then(response=>{
+          this.options=response.data;
+          console.log(this.options)
+      
+        })
+      },
+      handlerChangeRoomType(param){
+        this.$emit('eventChange',param)
+      },
     }
-  }
 }
 </script>
 

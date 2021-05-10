@@ -15,7 +15,7 @@ const routes = [
       {
         path: '/admin/list-account',
         name: 'ListAccount',
-        component: () => import( '../components/Admin/account/List.vue')
+        component: () => import( '../views/admin/account/List.vue')
     
       },
       {
@@ -26,21 +26,21 @@ const routes = [
       {
         path: '/admin/room',
         name: 'ListRoom',
-        component: () => import( '../components/Admin/room/Room.vue')
+        component: () => import( '../views/admin/room/Room.vue')
       },
       {
         path: '/admin/list-room-type',
         name: 'ListRoomType',
-        component: () => import( '../components/Admin/room/ListRoomType.vue')
+        component: () => import( '../views/admin/roomtype/ListRoomType.vue')
       },
       {
         path: '/admin/stuffs',
         name: 'ListStuffs',
-        component: () => import( '../components/Admin/stuffs/Stuffs.vue')
+        component: () => import( '../views/admin/stuffs/Stuffs.vue')
       },
       {
         path: '/admin/upload',
-        name: 'Listimg',
+        name: 'ListImg',
         component: () => import( '../components/Admin/UploadFile.vue')
       },
     

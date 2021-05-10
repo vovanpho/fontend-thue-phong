@@ -36,7 +36,7 @@
         ></b-pagination>
       </b-col>
     </b-row>
-    <b-button @click="addModal = !addModal" class="mr-1">+</b-button>
+    <b-button @click="addModal = !addModal" class="mr-1">Room Add</b-button>
     <b-modal v-model="addModal" hide-footer >
           <b-input-group class="mb-3" prepend="Name">
               <b-form-input v-model="item.nameRoom"></b-form-input>
@@ -44,13 +44,7 @@
           <b-input-group class="mb-3" prepend="Price">
               <b-form-input v-model="item.price"></b-form-input>
           </b-input-group>
-          <!-- <b-input-group class="mb-3" prepend="Description">
-              <b-form-input v-model="item.description"></b-form-input>
-          </b-input-group> -->
-          <b-form-group
-            label="Description"
-            class="mb-0"
-          >
+          <b-form-group label="Description" class="mb-0">
             <b-form-textarea
               id="textarea-formatter"
               v-model="item.description"
@@ -58,12 +52,13 @@
             ></b-form-textarea>
           </b-form-group>
           <b-form-group class="mt-3 mb-0" label="Lua chon the loai phong">
-              <b-form-select v-model="item.roomType.nameTypeRoom" @change="handlerChangeRoomType($event, item.roomType)">
+              <!-- <b-form-select v-model="item.roomType.nameTypeRoom" @change="handlerChangeRoomType($event, item.roomType)">
                 <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
                             {{selectOption.nameTypeRoom}} 
                 </option>
               </b-form-select>
-              <div class="mt-3">Selected: <strong>{{ item.roomType.nameTypeRoom }}</strong></div>
+              <div class="mt-3">Selected: <strong>{{ item.roomType.nameTypeRoom }}</strong></div> -->
+              <room-type  v-on:eventChange="handlerChangeRoomType($event)"></room-type>
               <b-input-group-append >
                 <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(item)">Save</b-button>
               </b-input-group-append>
@@ -84,6 +79,7 @@
       show-empty
       small
       @filtered="onFiltered"
+      hover
     >
       <template #cell(index)="data">
             {{ data.index + 1 }}
@@ -105,56 +101,40 @@
         <b-card>
           <ul>
             <li v-for="(value, key) in row.item" :key="key.id">
+              <!-- name -->
                 <b-input-group class="mb-3" prepend="Name" v-if="key=='nameRoom'">
                     <b-form-input v-model="row.item[key]"></b-form-input>
-                    <b-input-group-append>
-                    <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
-                    </b-input-group-append>
                 </b-input-group>
+              <!-- anh phong -->
                 <div  class="p-4 bg-dark"  v-if="key=='roomImgs'" style=" margin: 20px 0;">
                   <p style="color: white;" >Hinh anh phong:</p>
-                  <upload-file style="margin: 15px 0;" :dataSetId="row.item.id" dataSetCh="Nomal" v-on:eventCallLoadPage="loadPage"></upload-file>
-                  <div style="display: grid; grid-template-columns: 25% 25% 25% 25% ; overflow: hidden; " v-if="row.item[key].length>0">
-                    <div v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)" style="height: 168px; margin: 0 5px; position: relative;">
-                      <img  :src="`data:${it.type};base64,${it.data}`" alt="Image" style="width:100%; height: auto;">
-                      <b-button-group  style="position: absolute; top: 0;right: 0;">
-                        <b-dropdown size="sm" right no-caret>
-                            <b-dropdown-item><b-icon class="mr-2" icon="pencil-square" aria-hidden="true"></b-icon>Edit</b-dropdown-item>
-                            <b-dropdown-item @click="handlerDelete(it.id)"><b-icon class="mr-2" icon="trash" aria-hidden="true"></b-icon>Delete</b-dropdown-item>
-                        </b-dropdown>
-                      </b-button-group>
-                    </div>
-                  </div>
+                  <upload-file style="margin: 15px 0;" 
+                  :dataSetId="row.item.id" dataSetCh="Nomal" 
+                  :dataSetImgs="row.item[key]"
+                  v-on:eventCallLoadPage="loadPage"></upload-file>
                 </div>
-                <b-form-group 
-                          label="Description"
-                          class="mb-0 mb-4"
-                          v-if="key=='description'"
-                        >
-                          <b-form-textarea
-                            id="textarea-formatter"
-                            v-model="row.item[key]"
-                            placeholder="Enter your text"
-                          ></b-form-textarea>
+              <!-- mo ta -->
+                <b-form-group label="Description" class="mb-0 mb-4" v-if="key=='description'">
+                    <b-form-textarea
+                      id="textarea-formatter"
+                      v-model="row.item[key]"
+                      placeholder="Enter your text"
+                ></b-form-textarea>
                 </b-form-group>
+              <!-- tien -->
                 <b-input-group class="mb-3" prepend="Price" v-if="key=='price'">
                     <b-form-input v-model="row.item[key]"></b-form-input>
-                    <b-input-group-append>
-                    <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
-                    </b-input-group-append>
                 </b-input-group >
-
+              <!-- anh tien -->
                 <div  class="p-4 bg-dark"  v-if="key=='priceImgs'" style=" margin: 20px 0;">
                   <p style="color: white;">Hinh anh bang gia:</p>
-                  <upload-file style="margin: 15px 0;" :dataSetId="row.item.id" dataSetCh="Price"></upload-file>
-                  <div style="display: grid; grid-template-columns: 25% 25% 25% 25% ; overflow: hidden;  " v-if="row.item[key].length>0">
-                    <div v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)" style="height: 168px; margin: 0 5px;">
-                      <img  :src="`data:${it.type};base64,${it.data}`" alt="Image" style="width:100%; height: auto;">
-                    </div>
-                  </div>
+                  <upload-file style="margin: 15px 0;" 
+                  :dataSetId="row.item.id" dataSetCh="Price" 
+                  :dataSetImgs="row.item[key]" 
+                  v-on:eventCallLoadPage="loadPage"></upload-file>
                 </div>
-                
-                <div v-if="key=='roomType'">
+              <!-- loai phong -->
+                <!-- <div v-if="key=='roomType'">
                     <b-form-select v-model="selected" @change="handlerChangeRoomType($event, row.item[key])">
                         <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
                             {{selectOption.nameTypeRoom}} 
@@ -164,15 +144,13 @@
                     <b-input-group-append >
                         <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
                     </b-input-group-append>
-                </div>
-                <!-- <div v-if="key=='roomImgs'">
-                    <div   v-for="(it,index) in row.item[key]" :key="index" @load="handleLoadImg(it.data)">
-                    <img :src="`data:${it.type};base64,${it.data}`">  
-                    </div>
                 </div> -->
+                <div v-if="key=='roomType'">
+                  <room-type :dataSetName="row.item[key].nameTypeRoom" v-on:eventChange="handlerChangeRoomType($event,row.item[key])"></room-type>
+                </div>
                 
-                
-                
+                <b-button v-if="key=='roomType'" size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
+           
             </li>
           </ul>
         </b-card>
@@ -186,11 +164,13 @@
 <script>
 import {PATH, requestHeader} from '../../../index/index.js'
 import axios from "axios";
-import UploadFile from '../UploadFile.vue';
+import UploadFile from '../../../components/Admin/UploadFile.vue';
+import RoomType from '../../../components/Admin/room/RoomType.vue';
   export default {
     name: "Room",
     components:{
-      UploadFile
+      UploadFile,
+      RoomType
     },
     data() {
       return {
@@ -263,7 +243,7 @@ import UploadFile from '../UploadFile.vue';
         })
         .then(response=>{
           this.items=response.data;
-          console.log(this.items)
+          // console.log(this.items)
           this.totalRows =response.data.length
         })
       },
@@ -276,7 +256,7 @@ import UploadFile from '../UploadFile.vue';
         })
         .then(response=>{
           this.options=response.data;
-          console.log(this.options)
+          // console.log(this.options)
       
         })
       },
@@ -311,13 +291,20 @@ import UploadFile from '../UploadFile.vue';
           });
       },
       handlerChangeRoomType(event, pram){
+        if(pram){
+          this.options.forEach(element => {
+            if(element.nameTypeRoom==event){
+              pram.id=element.id
+              pram.nameTypeRoom=element.nameTypeRoom
+            }
+          });
+        }
         this.options.forEach(element => {
-          if(element.nameTypeRoom==event){
-            pram.id=element.id
-            pram.nameTypeRoom=element.nameTypeRoom
-          }
-        });
-        console.log(this.items)
+            if(element.nameTypeRoom==event){
+              this.item.roomType.id=element.id
+              this.item.roomType.nameTypeRoom=element.nameTypeRoom
+            }
+          });
       },
       deleteRoomType(e){
         fetch(`${PATH}api/room-type/delete`, {
@@ -338,9 +325,6 @@ import UploadFile from '../UploadFile.vue';
             console.log(error);
           });
       },
-      handleLoadImg(data){
-        
-      },
       froomName(value) {
         // console.log(value)
         return `${value.nameTypeRoom}`
@@ -348,22 +332,22 @@ import UploadFile from '../UploadFile.vue';
       handlerDelete(e){
         console.log(e)
         fetch(`${PATH}api/files/delete/${e}`, {
-          method: "POST",
+          method: "DELETE",
           headers: requestHeader().headers,
         })
           .then((response) => {
             if (!response.ok) {
-              alert("delete false");
+              // alert("delete false");
               this.loadPage();
             } else {
-              alert("delete thanh cong");
+              // alert("delete thanh cong");
               this.loadPage();
             }
           })
           .catch((error) => {
             console.log(error);
           });
-      }
+      },
     }
   }
 </script>

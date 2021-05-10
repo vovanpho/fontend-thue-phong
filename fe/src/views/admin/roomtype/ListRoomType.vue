@@ -63,6 +63,7 @@
       show-empty
       small
       @filtered="onFiltered"
+      hover
     >
       <template #cell(name)="row">
         {{ row.value.first }} {{ row.value.last }}
