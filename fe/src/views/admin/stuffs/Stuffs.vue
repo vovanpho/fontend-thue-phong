@@ -41,7 +41,7 @@
     <b-button @click="addModal = !addModal" class="mr-1">+</b-button>
     <b-modal v-model="addModal" hide-footer>
       <b-input-group class="mb-3" prepend="Name">
-        <b-form-input v-model="item.nameRoom"></b-form-input>
+        <b-form-input v-model="item.nameStuff"></b-form-input>
       </b-input-group>
       <b-input-group class="mb-3" prepend="Quality">
         <b-form-input v-model="item.quality"></b-form-input>
@@ -49,9 +49,7 @@
       <b-input-group class="mb-3" prepend="Description">
         <b-form-input v-model="item.description"></b-form-input>
       </b-input-group>
-      <select-room v-on:eventChange="handlerChangeRoom($event)"></select-room>
       <div>
-        
         <b-input-group-append>
           <b-button
             size="sm"
@@ -107,9 +105,6 @@
               </b-input-group>
               <b-input-group class="mb-3" prepend="Quality" v-if="key == 'quality'">
                 <b-form-input v-model="row.item[key]"></b-form-input>
-              </b-input-group>
-              <div v-if="key == 'room'">
-                <select-room :dataSetRoom="row.item[key]" v-on:eventChange="handlerChangeRoom($event,row.item[key])" ></select-room>
                 <b-input-group-append>
                   <b-button
                     size="sm"
@@ -119,7 +114,7 @@
                     >Save</b-button
                   >
                 </b-input-group-append>
-              </div>
+              </b-input-group>
             </li>
           </ul>
         </b-card>
@@ -146,8 +141,8 @@ export default {
             createdBy: null,
             lastModifiedDate: null,
             lastModifiedBy: null,
-            nameStuff: "",
-            quality:3,
+            nameStuff:'',
+            quality:null,
             description: null,
             room: {
                 id:null,
@@ -157,8 +152,6 @@ export default {
       fields: [
           'index',
         { key: "nameStuff", label: "Name", sortable: true },
-        { key: "room", label: "Room", formatter:'froomName' },
-        // { key: "room", label: "Room Type", formatter:'froomTypeName' },
         {
           sortable: true,
           sortByFormatted: true,
@@ -195,7 +188,6 @@ export default {
 
   created() {
     this.loadPage();
-    this.loadPageDataRoom();
   },
   methods: {
     loadPage() {
@@ -208,27 +200,9 @@ export default {
         })
         .then((response) => {
           this.items = response.data;
-          // console.log(this.items);
           this.totalRows = response.data.length;
         });
     },
-    loadPageDataRoom() {
-      axios
-        .get(`${PATH}api/room/getdata`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        })
-        .then((response) => {
-          this.options = response.data;
-          // console.log(this.options);
-        });
-    },
-    froomName(value) {
-        return `${value.nameRoom} -- ${value.roomType.nameTypeRoom}`
-      },
-
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
@@ -246,46 +220,8 @@ export default {
           if (!response.ok) {
             alert("Name already exists");
             this.loadPage();
-            // this.$refs.table.refresh()
-            // this.$router.go(this.$router.currentRoute)
           } else {
             alert("Name ");
-            this.loadPage();
-            // this.$router.go(this.$router.currentRoute)
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    handlerChangeRoom(event, pram) {
-       if(pram){
-          this.options.forEach(element => {
-            if(element.id==event.id){
-              pram.id=element.id
-              pram.nameRoom=element.nameRoom
-            }
-          });
-        }
-        this.options.forEach(element => {
-            if(element.id==event.id){
-              this.item.room.id=element.id
-              this.item.room.nameRoom=element.nameRoom
-            }
-          });
-    },
-    deleteRoomType(e) {
-      fetch(`${PATH}api/room-type/delete`, {
-        method: "POST",
-        headers: requestHeader().headers,
-        body: JSON.stringify(e),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            alert("delete false");
-            this.loadPage();
-          } else {
-            alert("delete thanh cong");
             this.loadPage();
           }
         })

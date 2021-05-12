@@ -2,7 +2,7 @@
   <b-container fluid>
     <!-- User Interface controls -->
     <b-row>
-      <b-col lg="6" class="my-1" v-if="perPage>10">
+      <b-col lg="6" class="my-1" v-if="totalRows>10">
         <b-form-group
           label="Filter"
           label-for="filter-input"
@@ -25,7 +25,7 @@
           </b-input-group>
         </b-form-group>
       </b-col>
-      <b-col sm="7" md="6" class="my-1" v-if="perPage>10">
+      <b-col sm="7" md="6" class="my-1" v-if="totalRows>10">
         <b-pagination
           v-model="currentPage"
           :total-rows="totalRows"
@@ -35,35 +35,38 @@
           class="my-0"
         ></b-pagination>
       </b-col>
+      <b-col sm="7" md="6" class="my-1" >
+        <b-button size="sm" @click="addModal = !addModal" class="mr-1">Room Add</b-button>
+        <b-modal v-model="addModal" hide-footer >
+              <b-input-group class="mb-3" prepend="Name">
+                  <b-form-input v-model="item.nameRoom"></b-form-input>
+              </b-input-group>
+              <b-input-group class="mb-3" prepend="Price">
+                  <b-form-input v-model="item.price"></b-form-input>
+              </b-input-group>
+              <b-form-group label="Description">
+                <b-form-textarea
+                  id="textarea-formatter"
+                  v-model="item.description"
+                  placeholder="Enter your text"
+                ></b-form-textarea>
+              </b-form-group>
+              <b-form-group label="Lua chon the loai phong">
+                  <room-type  v-on:eventChange="handlerChangeRoomType($event)"></room-type>
+              </b-form-group>
+              <!-- tro cap -->
+                <!-- <b-form-group >
+                  <list-stuff ></list-stuff>                
+                </b-form-group> -->
+              <b-form-group>
+                  <b-input-group-append >
+                    <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(item)">Save</b-button>
+                  </b-input-group-append>
+              </b-form-group>
+          </b-modal>
+      </b-col>
     </b-row>
-    <b-button @click="addModal = !addModal" class="mr-1">Room Add</b-button>
-    <b-modal v-model="addModal" hide-footer >
-          <b-input-group class="mb-3" prepend="Name">
-              <b-form-input v-model="item.nameRoom"></b-form-input>
-          </b-input-group>
-          <b-input-group class="mb-3" prepend="Price">
-              <b-form-input v-model="item.price"></b-form-input>
-          </b-input-group>
-          <b-form-group label="Description" class="mb-0">
-            <b-form-textarea
-              id="textarea-formatter"
-              v-model="item.description"
-              placeholder="Enter your text"
-            ></b-form-textarea>
-          </b-form-group>
-          <b-form-group class="mt-3 mb-0" label="Lua chon the loai phong">
-              <!-- <b-form-select v-model="item.roomType.nameTypeRoom" @change="handlerChangeRoomType($event, item.roomType)">
-                <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
-                            {{selectOption.nameTypeRoom}} 
-                </option>
-              </b-form-select>
-              <div class="mt-3">Selected: <strong>{{ item.roomType.nameTypeRoom }}</strong></div> -->
-              <room-type  v-on:eventChange="handlerChangeRoomType($event)"></room-type>
-              <b-input-group-append >
-                <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(item)">Save</b-button>
-              </b-input-group-append>
-          </b-form-group>
-      </b-modal>
+   
     <!-- Main table element -->
     <b-table
       :items="items"
@@ -111,7 +114,8 @@
                   <upload-file style="margin: 15px 0;" 
                   :dataSetId="row.item.id" dataSetCh="Nomal" 
                   :dataSetImgs="row.item[key]"
-                  v-on:eventCallLoadPage="loadPage"></upload-file>
+                  v-on:eventCallLoadPage="loadPage">
+                  </upload-file>
                 </div>
               <!-- mo ta -->
                 <b-form-group label="Description" class="mb-0 mb-4" v-if="key=='description'">
@@ -121,6 +125,13 @@
                       placeholder="Enter your text"
                 ></b-form-textarea>
                 </b-form-group>
+              <!-- tro cap -->
+                <div v-if="key=='stuffs'">
+                  <list-stuff :dataSetListStuff="row.item[key]" 
+                  :dataSetId="row.item.id" 
+                  v-on:eventChangeStuff="handlerChangeStuff($event,row.item[key])">
+                  </list-stuff>                
+                </div>
               <!-- tien -->
                 <b-input-group class="mb-3" prepend="Price" v-if="key=='price'">
                     <b-form-input v-model="row.item[key]"></b-form-input>
@@ -133,24 +144,11 @@
                   :dataSetImgs="row.item[key]" 
                   v-on:eventCallLoadPage="loadPage"></upload-file>
                 </div>
-              <!-- loai phong -->
-                <!-- <div v-if="key=='roomType'">
-                    <b-form-select v-model="selected" @change="handlerChangeRoomType($event, row.item[key])">
-                        <option v-for="(selectOption, indexOption) in options" :key='indexOption.id' :value="selectOption.nameTypeRoom" >
-                            {{selectOption.nameTypeRoom}} 
-                        </option>
-                    </b-form-select>
-                    <div class="mt-3">The loai phong: <strong>{{ selected=row.item[key].nameTypeRoom }}</strong></div>
-                    <b-input-group-append >
-                        <b-button size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
-                    </b-input-group-append>
-                </div> -->
+                <!-- loai phong -->
                 <div v-if="key=='roomType'">
                   <room-type :dataSetName="row.item[key].nameTypeRoom" v-on:eventChange="handlerChangeRoomType($event,row.item[key])"></room-type>
                 </div>
-                
                 <b-button v-if="key=='roomType'" size="sm" text="Button" variant="success" @click="handlerSaveName(row.item)">Save</b-button>
-           
             </li>
           </ul>
         </b-card>
@@ -166,11 +164,13 @@ import {PATH, requestHeader} from '../../../index/index.js'
 import axios from "axios";
 import UploadFile from '../../../components/Admin/UploadFile.vue';
 import RoomType from '../../../components/Admin/room/RoomType.vue';
+import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
   export default {
     name: "Room",
     components:{
       UploadFile,
-      RoomType
+      RoomType,
+      ListStuff
     },
     data() {
       return {
@@ -191,7 +191,8 @@ import RoomType from '../../../components/Admin/room/RoomType.vue';
                 lastModifiedDate: null,
                 lastModifiedBy: null,
                 nameTypeRoom: ""
-            }
+            }, 
+            stuffs: []
         },
         fields: [
           'index',
@@ -243,7 +244,6 @@ import RoomType from '../../../components/Admin/room/RoomType.vue';
         })
         .then(response=>{
           this.items=response.data;
-          // console.log(this.items)
           this.totalRows =response.data.length
         })
       },
@@ -267,23 +267,19 @@ import RoomType from '../../../components/Admin/room/RoomType.vue';
         this.currentPage = 1
       },
       handlerSaveName(e){
+        console.log(e)
           fetch(`${PATH}api/room/set-data-room`,
           { method: 'POST',
             headers: requestHeader().headers,
             body: JSON.stringify(e)
           })
           .then(response => { 
-            console.log(response)
               if(!response.ok){
                 alert("Name already exists")
                 this.loadPage();
-                // this.$refs.table.refresh()
-                // this.$router.go(this.$router.currentRoute)
               }else{
                 alert("Name ")
                 this.loadPage();
-                // this.$router.go(this.$router.currentRoute)
-
               }
             })
           .catch(error => {
@@ -305,6 +301,17 @@ import RoomType from '../../../components/Admin/room/RoomType.vue';
               this.item.roomType.nameTypeRoom=element.nameTypeRoom
             }
           });
+      },
+      handlerChangeStuff(dt,pram){
+        if(pram){
+          pram=dt
+          console.log(pram)
+        }else{
+          this.stuffs.push(dt)
+          console.log(this.stuffs)
+        }
+        
+       
       },
       deleteRoomType(e){
         fetch(`${PATH}api/room-type/delete`, {

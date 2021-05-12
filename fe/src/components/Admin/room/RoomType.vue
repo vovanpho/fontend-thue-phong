@@ -37,7 +37,7 @@ import axios from "axios";
         })
         .then(response=>{
           this.options=response.data;
-          console.log(this.options)
+          // console.log(this.options)
       
         })
       },

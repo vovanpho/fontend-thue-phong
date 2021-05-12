@@ -103,12 +103,11 @@ export default {
               'Authorization':`Bearer ${localStorage.getItem('accessToken')}`
             }
         }
-      ).then(function(){
-        console.log('SUCCESS!!');
-        this.$emit('eventCallLoadPage');
+      ).then((response)=>{
+          this.loadData();
       })
-      .catch(function(){
-        console.log('FAILURE!!');
+      .catch((error)=>{
+         this.loadData();
       });
     },
     handlerDelete(e){
