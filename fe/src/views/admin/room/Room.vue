@@ -128,8 +128,9 @@
               <!-- tro cap -->
                 <div v-if="key=='stuffs'">
                   <list-stuff :dataSetListStuff="row.item[key]" 
-                  :dataSetId="row.item.id" 
-                  v-on:eventChangeStuff="handlerChangeStuff($event,row.item[key])">
+                  :dataSetId="row.item.id"
+                  :statusSave="save" 
+                  v-on:eventChangeStuff="handlerChangeStuff($event,row.item[key])" >
                   </list-stuff>                
                 </div>
               <!-- tien -->
@@ -216,7 +217,8 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
         filterOn: [],
         addModal:false,
         options: null,
-        selected: null
+        selected: null,
+        save:false
       }
     },
     computed: {
@@ -267,6 +269,7 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
         this.currentPage = 1
       },
       handlerSaveName(e){
+         this.save=true
         console.log(e)
           fetch(`${PATH}api/room/set-data-room`,
           { method: 'POST',
@@ -278,7 +281,10 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
                 alert("Name already exists")
                 this.loadPage();
               }else{
-                alert("Name ")
+              //  this.save=false
+                console.log(this.save)
+                // alert("Name ")
+                
                 this.loadPage();
               }
             })
