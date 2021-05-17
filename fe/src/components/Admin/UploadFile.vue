@@ -10,8 +10,8 @@
         drop-placeholder="Drop file here..."
         required>
       </b-form-file>
-      <b-form-select v-if="dataSetCh==''" v-model="selected" :options="options" required></b-form-select>
-      <b-button type="submit" size="sm">Save</b-button>
+      <b-form-select v-show="dataSetCh==undefined" v-model="selected" :options="options" required></b-form-select>
+      <b-button v-show="dataSetCh==undefined" type="submit" size="sm">Save</b-button>
     </b-form>
     <div style="display: grid; grid-template-columns: 25% 25% 25% 25% ; overflow: hidden; " >
       <div v-for="(it,index) in imgs" :key="index"  style="height: 168px; margin: 0 5px; position: relative;">
@@ -34,7 +34,8 @@ export default {
   props:{
     dataSetId: String,
     dataSetCh: String,
-    dataSetImgs:Array
+    dataSetImgs:Array,
+    statusSave:Boolean
   },
   data(){
     return{
@@ -57,6 +58,15 @@ export default {
     }
     
   },
+  watch:{
+    statusSave: function () {
+      if(this.files.length>0){
+        this.submitFile()
+      }
+      
+    }    
+  },
+
   methods: {
     loadData(){
       axios.get(`${PATH}api/files`,{
@@ -86,7 +96,7 @@ export default {
       }
     },
     submitFile(event){
-     event.preventDefault();
+    //  event.preventDefault();
       let formData = new FormData();
       for( var i = 0; i < this.files.length; i++ ){
         let file = this.files[i];

@@ -96,8 +96,8 @@
         <b-button size="sm" @click="row.toggleDetails">
           {{ row.detailsShowing ? 'Hide' : 'Show' }} edit details
         </b-button>
-        <!-- <b-button size="sm"  @click="deleteRoomType(row.item)"><b-icon icon="trash" aria-hidden="true"></b-icon>
-        </b-button> -->
+        <b-button size="sm"  @click="deleteRoom(row.item)"><b-icon icon="trash" aria-hidden="true"></b-icon>
+        </b-button>
       </template>
 
       <template #row-details="row">
@@ -114,6 +114,7 @@
                   <upload-file style="margin: 15px 0;" 
                   :dataSetId="row.item.id" dataSetCh="Nomal" 
                   :dataSetImgs="row.item[key]"
+                  :statusSave="save" 
                   v-on:eventCallLoadPage="loadPage">
                   </upload-file>
                 </div>
@@ -143,6 +144,7 @@
                   <upload-file style="margin: 15px 0;" 
                   :dataSetId="row.item.id" dataSetCh="Price" 
                   :dataSetImgs="row.item[key]" 
+                  :statusSave="save" 
                   v-on:eventCallLoadPage="loadPage"></upload-file>
                 </div>
                 <!-- loai phong -->
@@ -231,7 +233,6 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
           })
       }
     },
-
     created(){
       this.loadPage();
       this.loadPageDataRoomType();
@@ -247,6 +248,8 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
         .then(response=>{
           this.items=response.data;
           this.totalRows =response.data.length
+          console.log(response.data)
+          this.save=false
         })
       },
       loadPageDataRoomType(){
@@ -258,19 +261,14 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
         })
         .then(response=>{
           this.options=response.data;
-          // console.log(this.options)
-      
         })
       },
-
       onFiltered(filteredItems) {
-        // Trigger pagination to update the number of buttons/pages due to filtering
         this.totalRows = filteredItems.length
         this.currentPage = 1
       },
       handlerSaveName(e){
          this.save=true
-        console.log(e)
           fetch(`${PATH}api/room/set-data-room`,
           { method: 'POST',
             headers: requestHeader().headers,
@@ -278,13 +276,8 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
           })
           .then(response => { 
               if(!response.ok){
-                alert("Name already exists")
                 this.loadPage();
               }else{
-              //  this.save=false
-                console.log(this.save)
-                // alert("Name ")
-                
                 this.loadPage();
               }
             })
@@ -354,6 +347,25 @@ import ListStuff from '../../../components/Admin/stuffs/ListStuff.vue';
               this.loadPage();
             } else {
               // alert("delete thanh cong");
+              this.loadPage();
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      },
+      deleteRoom(e){
+        fetch(`${PATH}api/room/delete`, {
+          method: "POST",
+          headers: requestHeader().headers,
+          body: JSON.stringify(e),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              alert("delete false");
+              this.loadPage();
+            } else {
+              alert("delete thanh cong");
               this.loadPage();
             }
           })

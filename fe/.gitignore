@@ -1,9 +1,8 @@
 .DS_Store
 node_modules
 /dist
-/src/assets/Music
 package-lock.json
-D:/
+
 
 # local env files
 .env.local

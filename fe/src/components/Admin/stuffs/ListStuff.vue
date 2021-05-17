@@ -10,26 +10,6 @@
             </li>
         </ul>
     </div>
-    <!-- <b-form-group
-      label="Individual inline checkboxes"
-      v-slot="{ ariaDescribedby }"
-
-    >
-
-
-      <b-form-checkbox
-        v-for="option in options"
-        v-model="selected"
-        :key="option.id"
-        :value="option"
-        :aria-describedby="ariaDescribedby"
-        name="flavour-4a"
-        inline
-        @change="eventChange($event)"
-      >
-        {{ option.nameStuff }}
-      </b-form-checkbox>
-    </b-form-group> -->
 </template>
 
 <script>
@@ -44,7 +24,7 @@ export default {
     },
     data() {
         return {
-            selected: [], // Must be an array reference!
+            selected: [],
             options: [],
             selectedOld:[],
             sc:[],
@@ -55,32 +35,29 @@ export default {
     mounted: function(){
         this.selected=this.dataSetListStuff
         this.selectedOld=this.dataSetListStuff
+        console.log(this.selected)
         
         
     }, 
     watch:{
         statusSave: function () {
-            // console.log(this.statusSave);
-            console.log(this.save+"ok");
-            console.log(this.nsc.length)
-           
-                // if(this.sc.length0){
-                //     console.log(this.sc.length)
-                //     this.saveChange(e, this.dataSetId)
-                // }
-                if(this.nsc.length>0){
-                    this.nsc.forEach(element => {
-                        this.deleteStuff(element, this.dataSetId)
-                        // this.save=false
-                    });
-                    
+
+                if(this.sc[0]!=Array.isArray([])){
+                    this.sc.forEach(r=>{
+                         console.log(r)
+                        this.saveChange(r, this.dataSetId)
+                    })
                 }
-           
+                if(this.nsc[0]>0){
+                    this.nsc.forEach(element => {
+                        console.log(element)
+                        this.deleteStuff(element, this.dataSetId)
+                    });
+                }
         }
     },
     created() {
         this.loadPage();
-        
     },
     methods: {
         loadPage() {
@@ -93,72 +70,54 @@ export default {
             })
             .then((response) => {
                 this.options = response.data;
-                // console.log(this.options)
+                console.log(response.data)
             });
         },
         eventChange(e){
-            // console.log(e);
-            // // this.$emit('eventChangeStuff', this.selected)
-            // console.log(this.selected)
-            // this.selected.forEach(element => {
-            //     // this.saveChange(element,this.dataSetId);
-            // });
             let o=[];
                 for (let j = 0; j < this.options.length; j++) {
                     o.push(this.options[j].id)
-                    console.log(o); 
                 }
             let so=[];
                 for (let k = 0; k < this.selectedOld.length; k++) {
                     so.push(this.selectedOld[k].id)
-                    console.log(so);
                 }
             let sn=[];
                 for (let i = 0; i < this.selected.length; i++) {
                     sn.push(this.selected[i].id)
-                    console.log(sn);
                 }
             let ns=[];
                 ns=(o.filter(fo => !sn.includes(fo)));
-                console.log(ns)
+
             let sc=[];
             let nsc=[];
-            console.log(so.length>sn.length,"so="+so,"sn="+sn);
+            console.log(so.length==sn.length,"so="+so,"sn="+sn);
             if (so.length>sn.length) {
                 nsc.push(so.filter(fso => ns.includes(fso)));
                 console.log("xoa"+nsc)
                 sc.push(sn.filter(fi => !so.includes(fi)));
                console.log("them"+sc)
             }else{
-                
                 nsc.push(so.filter(fso => ns.includes(fso)));
                 console.log("xoa"+nsc)
                 sc.push(sn.filter(fi => !so.includes(fi)));
                 console.log("them"+sc)
             }
-               
-                // c.forEach(r=>{
-                //     // console.log(r.values)
-                //     // r.forEach(t=>this.deleteStuff(t, this.dataSetId))
-                    
-                // })
-                this.sc=sc;
-                this.nsc=nsc;
+                this.sc=sc[0];
+                this.nsc=nsc[0];
             console.log("sc"+this.sc,"nsc"+this.nsc)
-          
-            // this.loadPage();
-            
         },
         saveChange(e, id){
-            fetch(`${PATH}api/room/set-data-room_stuff/${id}`,
-            { method: 'POST',
+            fetch(`${PATH}api/room/set-data-room_stuff/${id}/${e}`,{ 
+                method: 'POST',
                 headers: requestHeader().headers,
-                body: JSON.stringify(e)
             })
             .then(response => { 
                 if(!response.ok){
                     console.log('ok')
+                    this.loadPage();
                 }else{
+                    this.loadPage();
                 }
             })
             .catch(error => {
@@ -170,12 +129,10 @@ export default {
                 method: "POST",
                 headers: requestHeader().headers,
             })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
-                    alert("delete false");
                     this.loadPage();
                 } else {
-                    alert("delete thanh cong");
                     this.loadPage();
                 }
             })

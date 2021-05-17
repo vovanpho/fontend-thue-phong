@@ -89,8 +89,8 @@
         <b-button size="sm" @click="row.toggleDetails">
           {{ row.detailsShowing ? "Hide" : "Show" }} edit details
         </b-button>
-        <!-- <b-button size="sm"  @click="deleteRoomType(row.item)"><b-icon icon="trash" aria-hidden="true"></b-icon>
-        </b-button> -->
+        <b-button size="sm"  @click="deleteStuff(row.item)"><b-icon icon="trash" aria-hidden="true"></b-icon>
+        </b-button>
       </template>
 
       <template #row-details="row">
@@ -228,6 +228,25 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    deleteStuff(e){
+        fetch(`${PATH}api/stuffs/delete`, {
+          method: "POST",
+          headers: requestHeader().headers,
+          body: JSON.stringify(e),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              alert("delete false");
+              this.loadPage();
+            } else {
+              alert("delete thanh cong");
+              this.loadPage();
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
     },
   },
 };
